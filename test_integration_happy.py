@@ -3,14 +3,18 @@
 from io import BytesIO
 import re
 
+from PIL import Image
+
 
 def test_successful_prediction(client):
     """A successful upload returns a numeric prediction."""
-    img_data = BytesIO(b"fake_image_data")
+    img_data = BytesIO()
+    Image.new("RGB", (16, 16), "white").save(img_data, format="PNG")
+    img_data.seek(0)
 
     response = client.post(
         "/prediction",
-        data={"file": (img_data, "test.jpg")},
+        data={"file": (img_data, "test.png")},
         content_type="multipart/form-data",
     )
 
