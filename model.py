@@ -9,9 +9,9 @@ model = load_model("digit_model.h5")
 
 
 def preprocess_img(img_path):
-    """Resize and normalize an image into a three-channel batch."""
-    op_img = Image.open(img_path)
-    img_resize = op_img.resize((224, 224))
+    """Convert an image to RGB, resize it, and normalize its pixels."""
+    with Image.open(img_path) as image:
+        img_resize = image.convert("RGB").resize((224, 224))
     img2arr = img_to_array(img_resize) / 255.0
     img_reshape = img2arr.reshape(1, 224, 224, 3)
     return img_reshape

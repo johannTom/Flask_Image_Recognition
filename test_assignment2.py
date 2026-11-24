@@ -19,10 +19,10 @@ def web_client(monkeypatch):
         yield client
 
 
-def make_image():
-    """Create a valid RGB PNG image in memory."""
+def make_image(mode="RGB"):
+    """Create a valid PNG image in memory."""
     stream = BytesIO()
-    Image.new("RGB", (16, 16), "white").save(stream, format="PNG")
+    Image.new(mode, (16, 16), "white").save(stream, format="PNG")
     stream.seek(0)
     return stream
 
@@ -78,8 +78,9 @@ def test_invalid_image(web_client, monkeypatch):
     prediction.assert_not_called()
 
 
-def test_preprocessing():
-    """Preprocessing resizes an RGB image and normalizes its pixels."""
-    batch = model_module.preprocess_img(make_image())
+@pytest.mark.parametrize("mode", ["RGB", "L"], ids=["rgb", "grayscale"])
+def test_preprocessing(mode):
+    """Preprocessing normalizes RGB and grayscale images into RGB batches."""
+    batch = model_module.preprocess_img(make_image(mode))
     assert batch.shape == (1, 224, 224, 3)
     np.testing.assert_allclose(batch, 1.0)
